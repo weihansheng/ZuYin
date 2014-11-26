@@ -14,7 +14,8 @@ public class TimeUtil {
 
 	public final static String FORMAT_DATE = "yyyy-MM-dd";
 	public final static String FORMAT_TIME = "HH:mm";
-	public final static String FORMAT_TIME2 = "HH小时mm分ss秒";
+	public final static String FORMAT_TIME3 = "HH时mm分ss秒";
+	public final static String FORMAT_TIME2 = "HH:mm:ss";
 	public final static String FORMAT_MONTH_DAY_TIME = "MM月dd日  hh:mm";
 	public final static String FORMAT_MONTH_DAY_TIME_EN = "MM-dd hh:mm";
 

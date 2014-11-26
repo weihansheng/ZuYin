@@ -38,6 +38,9 @@
     <string name="cancel">取消</string>
     <string name="exit_title">下次记得再回来</string>
     
+    <string name="tool_light">手电筒</string>
+    <string name="tool_compass">指南针</string>
+    
     <string name="north">N</string>
     <string name="south">S</string>
     <string name="east">E</string>

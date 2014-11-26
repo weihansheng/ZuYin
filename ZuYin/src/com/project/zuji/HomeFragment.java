@@ -52,12 +52,6 @@ public class HomeFragment extends Fragment {
 	private Button bt_location;
 	private TextView bt_start;
 	private Context mContext;
-	// spinner
-	// 所有资源的图片 id的数组
-	int[] drawableIds = { R.drawable.icon_walk, R.drawable.icon_bike,
-			R.drawable.icon_car};
-	// 所有资源字符串 id的数组
-	int[] msgIds = { R.string.walk, R.string.bike, R.string.car };
 	// 定位相关
 	LocationClient mLocClient;
 	public MyLocationListenner myListener = new MyLocationListenner();

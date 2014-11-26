@@ -135,7 +135,7 @@ public class PlayMyRoute extends Activity implements BDLocationListener,
 		v_track.setBackgroundResource(R.drawable.icon_start);
 		v_track.setId(ID_track);
 		layoutparams_track = new MapView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
-				(int) (width * 0.5), (int) (height*0.7),
+				(int) (width * 0.5), (int) (height*0.78),
 				MapView.LayoutParams.CENTER);
 		mapview.addView(v_track, layoutparams_track);
 		v_track.setOnTouchListener(this);
@@ -310,7 +310,7 @@ public class PlayMyRoute extends Activity implements BDLocationListener,
 
 	// 用于任务中画轨迹
 	private boolean DrawLine(List_LineInfo item) {
-		Symbol lineSymbol = SymbolTools.getSymbol_line(0, 0, 255, 255, 4);
+		Symbol lineSymbol = SymbolTools.getSymbol_line(0, 0, 255, 255, 6);
 		Graphic lineGraphic = new Graphic(getGeometrytLine(item), lineSymbol);
 		graphicsoverlay.setData(lineGraphic);
 		mapview.refresh();
@@ -362,7 +362,7 @@ public class PlayMyRoute extends Activity implements BDLocationListener,
 				break;
 			case ID_track:
 				if (Const.isRecord) {
-					toast.show("正在记录巡示轨迹...");
+					toast.show("正在记录轨迹...");
 				} else {
 					if (Const.isTrack) {
 						Const.isTrack = false;

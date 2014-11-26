@@ -18,12 +18,13 @@
         android:paddingTop="10dp" >
 
         <TextView
+            android:id="@+id/tv_walk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:text="@string/walk"
-            android:textColor="@color/black"
+            android:textColor="@drawable/method_text_color_selector"
             android:textSize="@dimen/large_text_size" />
     </RelativeLayout>
 
@@ -46,13 +47,14 @@
         android:paddingTop="10dp" >
 
         <TextView
+            android:id="@+id/tv_car"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_marginBottom="10dp"
             android:text="@string/car"
-            android:textColor="@color/black"
+            android:textColor="@drawable/method_text_color_selector"
             android:textSize="@dimen/large_text_size" />
     </RelativeLayout>
      <RelativeLayout
@@ -69,11 +71,12 @@
          >
 
         <TextView
+            android:id="@+id/tv_bike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:text="@string/bike"
-            android:textColor="@color/black"
+            android:textColor="@drawable/method_text_color_selector"
             android:textSize="@dimen/large_text_size" />
 
     </RelativeLayout>

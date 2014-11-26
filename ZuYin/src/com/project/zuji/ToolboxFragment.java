@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -17,44 +18,51 @@ import android.widget.ListView;
 public class ToolboxFragment extends Fragment {
 
 	private View rootView;
-	private ListView listView;
+	private View toolCompass;
+	private View toolLight;
+	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		if (rootView == null) {
-			rootView = inflater.inflate(R.layout.calendar, container, false);
+			rootView = inflater.inflate(R.layout.tools_box, container, false);
 		}
 		ViewGroup parent = (ViewGroup) rootView.getParent();
 		if (parent != null) {
 			parent.removeView(rootView);
 		}
 
-		listView = (ListView) rootView.findViewById(R.id.listView);
-		initView();
+		initView(rootView);
 		return rootView;
 	}
 
-	private void initView() {
-		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-				getActivity(), android.R.layout.simple_list_item_1,
-				getCalendarData());
-		listView.setAdapter(arrayAdapter);
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapterView, View view,
-					int i, long l) {
-				Intent intent=new Intent();
+	private void initView(View rootView) {
+		toolCompass=rootView.findViewById(R.id.toolCompass);
+		toolLight=rootView.findViewById(R.id.toolLight);
+		ClickListener click=new ClickListener();
+		toolCompass.setOnClickListener(click);
+		//toolLight.setOnClickListener(click);
+	}
+	class ClickListener implements OnClickListener{
+
+		@Override
+		public void onClick(View v) {
+			Intent intent=new Intent();
+			// TODO Auto-generated method stub
+			switch (v.getId()) {
+			
+			case R.id.toolCompass:
 				intent.setClass(getActivity(), CompassActivity.class);
-				startActivity(intent);
+				break;
+
+			case R.id.toolLight:
+				break;
 			}
-		});
+			startActivity(intent);
+		}
+		
 	}
 
-	private ArrayList<String> getCalendarData() {
-		ArrayList<String> toolList = new ArrayList<String>();
-		toolList.add("指南针");
-		toolList.add("手电筒");
-		return toolList;
-	}
+	
 }

@@ -1,20 +1,23 @@
 package com.project.zuji.activity;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.text.format.DateFormat;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -44,7 +47,8 @@ import com.project.zuji.tools.TextTool;
 import com.project.zuji.tools.TimeUtil;
 import com.project.zuji.tools.ToastTool;
 
-public class AddActivity extends Activity implements BDLocationListener{
+public class AddActivity extends Activity implements BDLocationListener,
+		OnTouchListener {
 	private View backLayout;
 	private BMapManager mapman = null;
 	private MapView mapview = null;
@@ -66,29 +70,35 @@ public class AddActivity extends Activity implements BDLocationListener{
 	Double startLat, startLng, endLat, endLng;
 	String latlng_start, latlng_end;
 	GeoPoint point_end, point_start;
-	List<GeoPoint> myListGeo = new ArrayList<GeoPoint>();;
+	List<GeoPoint> myListGeo = new ArrayList<GeoPoint>();
+	List<GeoPoint> myListGeo2 = new ArrayList<GeoPoint>();
 
 	String[] startlatlng = new String[2];
 	String[] endlatlng = new String[2];
 	// 轨迹相关
 	private Line line;
 	private List<List_LineInfo> list = null;
-	private List<List_LineInfo> line_list = new ArrayList<List_LineInfo>();
 	private String tripMethod;
 
-	private Handler handler = null;
-	//记录时间
-	private long mLongCurrentTime = 0;
+	// 记录相关
+	private long mstartTime = 0;
 	private long mLongRunTime = 0;
 	private String startTime;
+	private String runTime;
+	private double distansce = 0;
+	private String distanceStr="0";
+	private TextView tvDistance;
+	private TextView tvRuntime;
+	private TextView tvMethod;
+	private ImageView imMethod;
 
 	/**
 	 * 添加自定义View
 	 */
 	private final int ID_record = 0, ID_track = 1;
 	private View v_record;
-	private Button btn_record;
-	//private MapView.LayoutParams layoutparams_record, layoutparams_track;
+	private MapView.LayoutParams layoutparams_record, layoutparams_track;
+	// private MapView.LayoutParams layoutparams_record, layoutparams_track;
 
 	// 提示
 	ToastTool toast = new ToastTool(this);
@@ -103,9 +113,9 @@ public class AddActivity extends Activity implements BDLocationListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//tripMethod= getIntent().getStringExtra("tripMethod");
-		tripMethod=Const.METHOD;
-		System.out.println("tripMethod---第二页"+tripMethod);
+		// tripMethod= getIntent().getStringExtra("tripMethod");
+		tripMethod = Const.METHOD;
+		System.out.println("tripMethod---第二页" + tripMethod);
 		mapman = new BMapManager(getApplication());
 		mapman.init(Const.BDKey, null);
 		setContentView(R.layout.add_layout);
@@ -141,9 +151,15 @@ public class AddActivity extends Activity implements BDLocationListener{
 		int height = display.getHeight();
 
 		// 记录轨迹按钮
-		btn_record=(Button) findViewById(R.id.btn_record);
-		ClickListener click=new ClickListener();
-		btn_record.setOnClickListener(click);
+		v_record = this.getLayoutInflater().inflate(R.layout.view_button, null);
+		v_record.setBackgroundResource(R.drawable.icon_start);
+		v_record.setId(ID_record);
+		layoutparams_record = new MapView.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT, (int) (width * 0.5),
+				(int) (height * 0.78), MapView.LayoutParams.CENTER);
+		mapview.addView(v_record, layoutparams_record);
+		v_record.setOnTouchListener(this);
 
 	}
 
@@ -199,12 +215,23 @@ public class AddActivity extends Activity implements BDLocationListener{
 
 	private void init() {
 		mapview = (MapView) findViewById(R.id.bmapView2);
-		backLayout=findViewById(R.id.addroute_back_layout);
+		backLayout = findViewById(R.id.addroute_back_layout);
+		tvDistance=(TextView) findViewById(R.id.tv_distance);
+		tvRuntime=(TextView) findViewById(R.id.tv_runtime);
+		tvMethod=(TextView) findViewById(R.id.tv_mothod);
+		tvMethod.setText(Const.METHOD);
+		imMethod=(ImageView) findViewById(R.id.im_method);
+		if ("汽车".equals(Const.METHOD)) {
+			imMethod.setImageResource(R.drawable.small_walk);
+		}else if ("骑车".equals(Const.METHOD)) {
+			imMethod.setImageResource(R.drawable.small_walk);
+		}else {
+			imMethod.setImageResource(R.drawable.small_walk);
+		}
 		backLayout.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				finish();
 			}
 		});
@@ -235,6 +262,7 @@ public class AddActivity extends Activity implements BDLocationListener{
 				list.add(item);
 				DrawLine(item);
 				latlng_start = latlng_end;
+				myListGeo2.add(point); // 如果正在记录 就把记录期间的point点记录到myListGeo2
 
 			}
 		}
@@ -295,14 +323,22 @@ public class AddActivity extends Activity implements BDLocationListener{
 		return linegeometry;
 	}
 
-	class ClickListener implements OnClickListener{
-
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-
+	// 地图上的自定义控件触摸监听
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		if (event.getAction() == MotionEvent.ACTION_UP) {
 			switch (v.getId()) {
-			case R.id.btn_record:
+			case ID_record:
+
+				break;
+			case ID_track:
+
+				break;
+			}
+		}
+		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			switch (v.getId()) {
+			case ID_record:
 				if (Const.isTrack) {
 					toast.show("正在播放轨迹！");
 				} else {
@@ -311,22 +347,25 @@ public class AddActivity extends Activity implements BDLocationListener{
 						if (!Const.isFirst) {
 							Const.isFirst = true;
 						}
-						System.out.println("记录结束");
-						//得到记录的时间  单位毫秒
-						mLongRunTime = (System.currentTimeMillis()- mLongCurrentTime);
 						
-						//System.out.println("结束时间===="+TimeUtil.getCurrentTime(TimeUtil.FORMAT_DATE_TIME_SECOND));
-						//System.out.println("记录时间===="+formatter.format(ms-TimeZone.getDefault().getRawOffset()));
-						//中国为东八区  需要减去8个小时
-						System.out.println("记录时间===="+TimeUtil.longToString(mLongRunTime-TimeZone.getDefault().getRawOffset(), TimeUtil.FORMAT_TIME2));
+						
+				
+						
+						
+						// 得到记录的时间 单位毫秒
+						//mLongRunTime = (System.currentTimeMillis() - mstartTime);
+						//runTime = TimeUtil.longToString(mLongRunTime- TimeZone.getDefault().getRawOffset(), TimeUtil.FORMAT_TIME2);
+
+						// 中国为东八区 需要减去8个小时
+						System.out.println("记录时间===="+runTime);
 						DrawMarker(locData.latitude, locData.longitude,
 								Const.MARKERT_END);
-						toast.show("巡示完成，可观看轨迹回放！");
+						toast.show("恭喜您，记录完成！");
 
 						// 存到本地------------------------------------------------------
 
 						/**
-						 * -用来分隔起点和终点， ；用来分隔每一条线
+						 * -用来分隔起点和终点， ；用来分隔每一条线  把list转换成字符串存到本地
 						 */
 						StringBuffer sb = new StringBuffer();
 						if (list.size() > 1) {
@@ -345,86 +384,91 @@ public class AddActivity extends Activity implements BDLocationListener{
 
 							}
 						}
-						if (mLongRunTime>2000) {
-							//存储数据到本地
+						if (distansce > 0.03) {
+							// 存储数据到本地
 							DatebaseService service = new DatebaseService(
 									getApplicationContext());
-							//line.setLineStr(sb.toString());
-							if (sb.toString()!=null) {
-								readStr(sb.toString());
-								System.out.println("line.getLineStr()"+line.getLineStr());
-								System.out.println("line.getId()----------"+line.getId());
-								//计算里程
+							// line.setLineStr(sb.toString());
+							if (sb.toString() != null) {
+								//readStr(sb.toString());  处理数据
+								
+								
+								String avg_speed = String.valueOf((distansce * 3600 * 1000) / mLongRunTime);
+								String str_avg_speed = avg_speed.substring(0, avg_speed.lastIndexOf(".") + 2);
+								line = new Line(sb.toString(), startTime, str_avg_speed, null, distanceStr,
+										runTime, tripMethod);
+								
+								
+								System.out.println("line.getLineStr()"
+										+ line.getLineStr());
+								System.out.println("line.getId()----------"
+										+ line.getId());
+								// 计算里程
 								service.insertData(line);
-							}else {
+							} else {
 								System.out.println("路线为空");
 							}
-							
-							
-						}else {
-							toast.show("记录太短！");
+
+						} else {
+							toast.show("距离太短！");
 						}
-						
-						btn_record.setBackgroundResource(R.drawable.icon_start);
+
+						v_record.setBackgroundResource(R.drawable.icon_start);
 					} else {
 						System.out.println("开始记录");
-						mLongCurrentTime = System.currentTimeMillis();
-						startTime=TimeUtil.getCurrentTime(TimeUtil.FORMAT_DATE);
-						System.out.println("开始时间===="+TimeUtil.getCurrentTime(TimeUtil.FORMAT_DATE_TIME_SECOND));
+						new TimeThread().start(); //开始计时  开始计算里程
+						mstartTime = System.currentTimeMillis();
+						startTime = TimeUtil
+								.getCurrentTime(TimeUtil.FORMAT_DATE);
+						System.out
+								.println("开始时间===="
+										+ TimeUtil
+												.getCurrentTime(TimeUtil.FORMAT_DATE_TIME_SECOND));
 						ClearLine();
 						ClearMarkert();
 						list = new ArrayList<List_LineInfo>();
 						Const.isRecord = true;
-						btn_record.setBackgroundResource(R.drawable.icon_stop);
+						v_record.setBackgroundResource(R.drawable.icon_stop);
 
-						toast.show("正在记录巡示轨迹！");
+						toast.show("正在记录轨迹！");
 					}
 				}
 				break;
-			
+
 			}
-		
-			
 		}
-		
+		return false;
 	}
-	private void readStr(String lineStr){
+/*
+	private void readStr(String lineStr) {
 		String[] splitlist = lineStr.split(";");
 		for (int i = 0; i < splitlist.length; i++) {
 
-		
 			// 把字符串数组lineList转化为List_LineInfo
 			List_LineInfo list2 = new List_LineInfo();
 			String[] str = splitlist[i].split("-");
 			list2.setStart_latlng(str[0].toString());
 			list2.setEnd_latlng(str[1].toString());
 			// 把字符串数组lineList转化为GeoPoint数组用来计算两点距离
-			String starLatitude = list2.getStart_latlng()
-					.split(",")[0].substring(0, list2
-					.getStart_latlng().split(",")[0].indexOf("."))
-					+ list2.getStart_latlng().split(",")[0]
-							.substring(list2.getStart_latlng()
-									.split(",")[0].indexOf(".") + 1);
-			String starLongitude = list2.getStart_latlng().split(
-					",")[1].substring(0, list2.getStart_latlng()
-					.split(",")[1].indexOf("."))
-					+ list2.getStart_latlng().split(",")[1]
-							.substring(list2.getStart_latlng()
-									.split(",")[1].indexOf(".") + 1);
-			String endLatitude = list2.getEnd_latlng().split(",")[0]
+			String starLatitude = list2.getStart_latlng().split(",")[0]
 					.substring(0,
-							list2.getEnd_latlng().split(",")[0]
-									.indexOf("."))
-					+ list2.getEnd_latlng().split(",")[0]
-							.substring(list2.getEnd_latlng().split(
-									",")[0].indexOf(".") + 1);
+							list2.getStart_latlng().split(",")[0].indexOf("."))
+					+ list2.getStart_latlng().split(",")[0].substring(list2
+							.getStart_latlng().split(",")[0].indexOf(".") + 1);
+			String starLongitude = list2.getStart_latlng().split(",")[1]
+					.substring(0,
+							list2.getStart_latlng().split(",")[1].indexOf("."))
+					+ list2.getStart_latlng().split(",")[1].substring(list2
+							.getStart_latlng().split(",")[1].indexOf(".") + 1);
+			String endLatitude = list2.getEnd_latlng().split(",")[0].substring(
+					0, list2.getEnd_latlng().split(",")[0].indexOf("."))
+					+ list2.getEnd_latlng().split(",")[0].substring(list2
+							.getEnd_latlng().split(",")[0].indexOf(".") + 1);
 			String endLongitude = list2.getEnd_latlng().split(",")[1]
 					.substring(0,
-							list2.getEnd_latlng().split(",")[1]
-									.indexOf("."))
-					+ list2.getEnd_latlng().split(",")[1]
-							.substring(list2.getEnd_latlng().split(
-									",")[1].indexOf(".") + 1);
+							list2.getEnd_latlng().split(",")[1].indexOf("."))
+					+ list2.getEnd_latlng().split(",")[1].substring(list2
+							.getEnd_latlng().split(",")[1].indexOf(".") + 1);
 			GeoPoint geoPoint;
 			geoPoint = new GeoPoint(Integer.parseInt(starLatitude),
 					Integer.parseInt(starLongitude));
@@ -432,47 +476,106 @@ public class AddActivity extends Activity implements BDLocationListener{
 			geoPoint = new GeoPoint(Integer.parseInt(endLatitude),
 					Integer.parseInt(endLongitude));
 			myListGeo.add(geoPoint);
-			List_LineInfo item = new List_LineInfo(
-					list2.getEnd_latlng(), list2.getStart_latlng());
+			List_LineInfo item = new List_LineInfo(list2.getEnd_latlng(),
+					list2.getStart_latlng());
 			line_list.add(item);
 
 		}
-		double distansce = 0;
+		double distansce2 = 0;
 		// 格式化经纬度
 		for (int i = 0; i < myListGeo.size(); i++) {
 			myListGeo.get(i).setLatitudeE6(
-					TextTool.intLatitude(myListGeo.get(i)
-							.getLatitudeE6()));
+					TextTool.intLatitude(myListGeo.get(i).getLatitudeE6()));
 			myListGeo.get(i).setLongitudeE6(
-					TextTool.intLongitude(myListGeo.get(i)
-							.getLongitudeE6()));
+					TextTool.intLongitude(myListGeo.get(i).getLongitudeE6()));
 		}
 		for (int j = 0; j < myListGeo.size() - 1; j++) {
 			// 计算两个位置点之间的距离
-			double dTempDis = DistanceUtil.getDistance(
-					myListGeo.get(j), myListGeo.get(j + 1));
-			distansce = distansce + dTempDis;
+			double dTempDis = DistanceUtil.getDistance(myListGeo.get(j),
+					myListGeo.get(j + 1));
+			distansce2 = distansce2 + dTempDis;
 		}
-		//把米转化为千米
-		String disStr = String.valueOf(distansce/1000);
-		String temp = String.valueOf((distansce*3600*1000)/mLongRunTime);
-		String str_avg_speed = temp.substring(0,temp.lastIndexOf(".")+2);
-		System.out.println("平均速度："+str_avg_speed+"km/h");
-		//里程保留一位小数
-		disStr = disStr.substring(0, disStr.lastIndexOf(".")+2);
+		// 把米转化为千米
+		String disStr = String.valueOf(distansce2 / 1000);
+		String avg_speed = String.valueOf((distansce2 * 3600 * 1000) / mLongRunTime);
+		String str_avg_speed = avg_speed.substring(0, avg_speed.lastIndexOf(".") + 2);
+		System.out.println("平均速度：" + str_avg_speed + "km/h");
+		// 里程保留一位小数
+		disStr = disStr.substring(0, disStr.lastIndexOf(".") + 2);
 		System.out.println("disStr=====" + disStr);
-		String runTime=TimeUtil.longToString(mLongRunTime-TimeZone.getDefault().getRawOffset(), TimeUtil.FORMAT_TIME2);
-		line=new Line(lineStr, startTime, str_avg_speed, null, disStr, runTime,tripMethod);
-		//line.setAveSpeed(str_avg_speed);
-		//line.setDistance(disStr);
-		//line.setTime(startTime);
-		//line.setRunTime(TimeUtil.longToString(mLongRunTime-TimeZone.getDefault().getRawOffset(), TimeUtil.FORMAT_TIME2));
-		//System.out.println("line.getAveSpeed："+line.getAveSpeed()+"km/h");
-		//System.out.println("line.getDistance："+line.getDistance());
-		//System.out.println("line.getTime："+line.getTime());
-		System.out.println("line.tripMethod："+line.getTripMethod());
 		
+		line = new Line(lineStr, startTime, str_avg_speed, null, disStr,
+				runTime, tripMethod);
+		// line.setAveSpeed(str_avg_speed);
+		// line.setDistance(disStr);
+		// line.setTime(startTime);
+		// line.setRunTime(TimeUtil.longToString(mLongRunTime-TimeZone.getDefault().getRawOffset(),
+		// TimeUtil.FORMAT_TIME2));
+		// System.out.println("line.getAveSpeed："+line.getAveSpeed()+"km/h");
+		// System.out.println("line.getDistance："+line.getDistance());
+		// System.out.println("line.getTime："+line.getTime());
+		System.out.println("line.tripMethod：" + line.getTripMethod());
+
 	}
+*/
+	public class TimeThread extends Thread {
+        @Override
+        public void run () {
+            do {
+                try {
+                    Thread.sleep(1000);
+                    Message msg = new Message();
+                    msg.what = 000;
+                    
+                    //如果正在记录  则实时更新  记录时间和里程
+                    if (Const.isRecord) {
+                    	// 计算实时距离
+						//double distansce_now = 0;
+						for (int j = 0; j < myListGeo2.size() - 1; j++) {
+							// 计算两个位置点之间的距离
+							double dTempDis = DistanceUtil.getDistance(
+									myListGeo2.get(j), myListGeo2.get(j + 1));
+							//distansce_now = distansce_now + dTempDis+j*1000;
+							distansce= distansce + dTempDis;
+						}
+						String disStr=String.valueOf(distansce/1000);
+						// 里程保留一位小数
+						distanceStr = disStr.substring(0, disStr.lastIndexOf(".") + 2);
+						
+						mLongRunTime = (System.currentTimeMillis() - mstartTime);
+						runTime = TimeUtil.longToString(mLongRunTime
+								- TimeZone.getDefault().getRawOffset(), TimeUtil.FORMAT_TIME2);
+                    }
+                    
+                    Bundle bundle=new Bundle();  
+                    bundle.putString("distance", distanceStr);  
+                    bundle.putString("runtime", runTime);  
+                    msg.setData(bundle);//bundle传值，耗时，效率低  
+                    mHandler.sendMessage(msg);
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while(true);
+        }
+    }
+	private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage (Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 000:
+                    Bundle b = msg.getData();
+                    tvDistance.setText(b.getString("distance"));
+                    tvRuntime.setText(b.getString("runtime"));
+                    break;
+                
+                default:
+                    break;
+            }
+        }
+    };
+
 
 	private void ClearLine() {
 		if (graphicsoverlay.getAllGraphics().size() != 0) {

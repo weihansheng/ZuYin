@@ -78,7 +78,7 @@ public class ListAdapter extends BaseAdapter {
 		if (convertView == null) {
 			holder = new ViewHolder();
 			convertView = mInflater.inflate(
-					R.layout.listitem_collect, null);
+					R.layout.listitem_myroute, null);
 			holder.time = (TextView) convertView
 					.findViewById(R.id.list_item_time);
 			holder.runTime = (TextView) convertView

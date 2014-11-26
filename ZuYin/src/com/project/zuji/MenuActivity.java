@@ -38,6 +38,10 @@ OnActionSheetSelected, OnCancelListener{
     private View view_bike;
     private View view_car;
     private TextView tv_trip_method;
+    private TextView tvTitle;
+    private TextView tvBike;
+    private TextView tvWalk;
+    private TextView tvCar;
 
     /**
      * Called when the activity is first created.
@@ -51,7 +55,11 @@ OnActionSheetSelected, OnCancelListener{
         view_bike=pop_view.findViewById(R.id.view_select_bike);
         view_car=pop_view.findViewById(R.id.view_select_car);
         view_walk=pop_view.findViewById(R.id.view_select_walk);
+        tvBike=(TextView) pop_view.findViewById(R.id.tv_bike);
+        tvCar=(TextView) pop_view.findViewById(R.id.tv_car);
+        tvWalk=(TextView) pop_view.findViewById(R.id.tv_walk);
         tv_trip_method=(TextView) findViewById(R.id.trip_method);
+        tvTitle=(TextView) findViewById(R.id.tv_title);
         mContext = this;
         setUpMenu();
         changeFragment(new HomeFragment());
@@ -69,7 +77,7 @@ OnActionSheetSelected, OnCancelListener{
 
         // create menu items;
         itemHome     = new ResideMenuItem(this, R.drawable.icon_home,     "首页");
-        itemProfile  = new ResideMenuItem(this, R.drawable.icon_line,  "我的轨迹");
+        itemProfile  = new ResideMenuItem(this, R.drawable.icon_myroute,  "我的轨迹");
         itemCalendar = new ResideMenuItem(this, R.drawable.icon_toolsbox, "工具箱");
         itemSettings = new ResideMenuItem(this, R.drawable.icon_settings, "设置");
 
@@ -113,14 +121,18 @@ OnActionSheetSelected, OnCancelListener{
         if (view == itemHome){
             changeFragment(new HomeFragment());
             open_pop_view.setVisibility(View.VISIBLE);
+            tvTitle.setText("首页");
         }else if (view == itemProfile){
             changeFragment(new MyrouteFragment());
+            tvTitle.setText("我的足印");
             open_pop_view.setVisibility(View.INVISIBLE);
         }else if (view == itemCalendar){
             changeFragment(new ToolboxFragment());
+            tvTitle.setText("工具箱");
             open_pop_view.setVisibility(View.INVISIBLE);
         }else if (view == itemSettings){
             changeFragment(new SettingsFragment());
+            tvTitle.setText("设置");
             open_pop_view.setVisibility(View.INVISIBLE);
         }
         resideMenu.closeMenu();
@@ -144,7 +156,7 @@ OnActionSheetSelected, OnCancelListener{
 		 					getResources(), (Bitmap) null));
 
 		 			// 设置好参数之后再show
-		 			popupWindow.showAsDropDown(open_pop_view, -10, 0);
+		 			popupWindow.showAsDropDown(open_pop_view, 0, -10);
 				break;
 			case R.id.view_select_bike:
 				tv_trip_method.setText("骑车");

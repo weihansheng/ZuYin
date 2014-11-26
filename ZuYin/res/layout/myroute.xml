@@ -46,14 +46,13 @@
             android:id="@+id/listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:cacheColorHint="#00000000"
             android:choiceMode="singleChoice"
             android:divider="@color/toolbox_line"
             android:dividerHeight="0.5dp"
-            android:drawSelectorOnTop="true"
+            android:drawSelectorOnTop="false"
             android:focusable="false"
             android:gravity="center"
-            android:listSelector="#000000"
+            android:listSelector="@drawable/list_item_selector"
             android:scrollbars="none" />
     </LinearLayout>
 
