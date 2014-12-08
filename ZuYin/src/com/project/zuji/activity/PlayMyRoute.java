@@ -94,7 +94,7 @@ public class PlayMyRoute extends Activity implements BDLocationListener,
 		getMyroute();
 		mapman = new BMapManager(getApplication());
 		mapman.init(Const.BDKey, null);
-		setContentView(R.layout.play_route);
+		setContentView(R.layout.activity_play_route);
 		init();
 		mapview.setBuiltInZoomControls(true);
 		mapcontroller = mapview.getController();
@@ -396,7 +396,6 @@ public class PlayMyRoute extends Activity implements BDLocationListener,
 	private void getMyroute(){
 		// 获取数据-----------------------------------
 		String lineStr = getIntent().getStringExtra("lineStr");
-		System.out.println("lineStr=====" + lineStr.toString());
 		String[] splitlist = lineStr.split(";");
 		for (int i = 0; i < splitlist.length; i++) {
 			// 把字符串数组lineList转化为List_LineInfo
@@ -409,10 +408,7 @@ public class PlayMyRoute extends Activity implements BDLocationListener,
 			
 			String thisStr=str[0].toString()+str[1].toString();
 			String lastStr=laststr[0].toString()+laststr[1].toString();
-			System.out.println("str=====" + thisStr);
-			System.out.println("laststr=====" +lastStr);
 			if (!thisStr.equals(lastStr)) {
-				System.out.println("不相等");
 				list2.setStart_latlng(str[0].toString());
 				list2.setEnd_latlng(str[1].toString());
 				List_LineInfo item = new List_LineInfo(

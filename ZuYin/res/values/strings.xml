@@ -22,6 +22,7 @@
     <string name="playroute">播放轨迹</string>
     <string name="addroute">记录轨迹</string>
     <string name="opinion_feedback">意见反馈</string>
+    <string name="compass">指南针</string>
     <string name="update">检测更新</string>
     <string name="auto_update">自动更新</string>
     <string name="cleanCache">清除缓存</string>

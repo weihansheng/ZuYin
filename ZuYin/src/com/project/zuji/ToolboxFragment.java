@@ -3,6 +3,7 @@ package com.project.zuji;
 import java.util.ArrayList;
 
 import com.project.zuji.activity.CompassActivity;
+import com.project.zuji.activity.LightActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,7 +27,7 @@ public class ToolboxFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		if (rootView == null) {
-			rootView = inflater.inflate(R.layout.tools_box, container, false);
+			rootView = inflater.inflate(R.layout.fragment_tools_box, container, false);
 		}
 		ViewGroup parent = (ViewGroup) rootView.getParent();
 		if (parent != null) {
@@ -42,7 +43,7 @@ public class ToolboxFragment extends Fragment {
 		toolLight=rootView.findViewById(R.id.toolLight);
 		ClickListener click=new ClickListener();
 		toolCompass.setOnClickListener(click);
-		//toolLight.setOnClickListener(click);
+		toolLight.setOnClickListener(click);
 	}
 	class ClickListener implements OnClickListener{
 
@@ -57,6 +58,7 @@ public class ToolboxFragment extends Fragment {
 				break;
 
 			case R.id.toolLight:
+				intent.setClass(getActivity(), LightActivity.class);
 				break;
 			}
 			startActivity(intent);

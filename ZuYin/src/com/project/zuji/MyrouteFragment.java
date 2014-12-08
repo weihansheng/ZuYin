@@ -39,7 +39,7 @@ public class MyrouteFragment extends Fragment implements IXListViewListener{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	if (rootView == null) {
-    		rootView=inflater.inflate(R.layout.myroute, container, false);
+    		rootView=inflater.inflate(R.layout.fragment_myroute, container, false);
 		}
 		ViewGroup parent = (ViewGroup) rootView.getParent();
 		if (parent != null) {

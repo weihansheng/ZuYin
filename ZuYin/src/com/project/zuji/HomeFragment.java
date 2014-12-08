@@ -106,7 +106,7 @@ public class HomeFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.home2, container, false);
+		rootView = inflater.inflate(R.layout.fragment_home, container, false);
 		findById(rootView);
 		bt_start.setOnClickListener(new OnClickListener() {
 

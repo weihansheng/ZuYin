@@ -19,7 +19,7 @@
             android:padding="7dp"
             android:text="首页"
             android:textColor="@color/white"
-            android:textSize="24sp" />
+            android:textSize="@dimen/xxlarge_text_size" />
 
         <Button
             android:id="@+id/title_bar_left_menu"

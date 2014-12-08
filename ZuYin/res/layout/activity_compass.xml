@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dip"
-                android:background="@drawable/arrow_back"
+                android:background="@drawable/icon_arrow_back"
                 android:gravity="center"
                 android:includeFontPadding="false" />
 
@@ -50,9 +50,9 @@
             android:ellipsize="end"
             android:gravity="center"
             android:singleLine="true"
-            android:text="@string/opinion_feedback"
+            android:text="@string/compass"
             android:textColor="@color/white"
-            android:textSize="@dimen/large_text_size" />
+            android:textSize="@dimen/xxlarge_text_size" />
     </RelativeLayout>
 
     <com.project.zuji.widget.CompassView

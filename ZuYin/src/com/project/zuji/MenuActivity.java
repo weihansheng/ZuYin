@@ -49,7 +49,7 @@ OnActionSheetSelected, OnCancelListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.fragment_main);
         open_pop_view=findViewById(R.id.open_pop_view);
         pop_view = getLayoutInflater().inflate(R.layout.select_popup_window, null);
         view_bike=pop_view.findViewById(R.id.view_select_bike);
